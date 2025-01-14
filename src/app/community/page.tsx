@@ -1,36 +1,40 @@
-import db from "@/db/index";
+// app/community/page.tsx
+import db from "@/db";
 import { communities } from "@/db/schema";
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export default async function CommunityListPage() {
-  // Server component içinde doğrudan DB sorgusu
   const allCommunities = await db.select().from(communities);
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-bold">Topluluklar</h1>
-        <Link href="/community/create" className="text-blue-600">
-          Yeni Topluluk Oluştur
+    <div className="container mx-auto py-8 px-4">
+      <header className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">Communities</h1>
+        <Link href="/community/create">
+          <Button variant="default">Create New Community</Button>
         </Link>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      </header>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {allCommunities.map((com) => (
-          <Card key={com.id}>
+          <Card key={com.id} className="shadow hover:shadow-lg transition">
             <CardHeader>
-              <CardTitle>{com.name}</CardTitle>
+              <CardTitle className="text-xl font-semibold text-gray-800">
+                {com.name}
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <p>{com.description}</p>
+              <p className="text-sm text-gray-600">{com.description}</p>
               <p className="text-sm text-gray-500 mt-2">
-                Lokasyon: {com.location || "—"}
+                Location: {com.location || "N/A"}
               </p>
               <Link
                 href={`/community/${com.id}`}
-                className="text-blue-600 text-sm mt-2 inline-block"
+                className="text-blue-600 hover:text-blue-800 text-sm mt-3 block"
               >
-                Detaylar
+                View Details
               </Link>
             </CardContent>
           </Card>

@@ -1,22 +1,24 @@
 "use client";
 
-import React from "react";
 import { useRouter } from "next/navigation";
-import { createEventAction } from "../_actions";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+
+import { createEventAction } from "../_actions";
 
 export default function CreateEventPage() {
   const router = useRouter();
 
   return (
-    <div className="container mx-auto py-8">
-      <Card className="max-w-lg mx-auto">
+    <div className="container mx-auto py-8 px-4">
+      <Card className="max-w-lg mx-auto border-gray-200">
         <CardHeader>
-          <CardTitle>Etkinlik Oluştur</CardTitle>
+          <CardTitle className="text-xl font-bold">
+            Create a New Event
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <form
@@ -27,24 +29,19 @@ export default function CreateEventPage() {
             className="space-y-4"
           >
             <div>
-              <Label htmlFor="name">Etkinlik Adı</Label>
-              <Input
-                id="name"
-                name="name"
-                placeholder="Sabah Koşusu"
-                required
-              />
+              <Label htmlFor="name">Event Name</Label>
+              <Input id="name" name="name" required placeholder="Sunday Run" />
             </div>
             <div>
-              <Label htmlFor="description">Açıklama</Label>
+              <Label htmlFor="description">Description</Label>
               <Textarea
                 id="description"
                 name="description"
-                placeholder="Etkinliğin detayları..."
+                placeholder="Details about your event..."
               />
             </div>
             <div>
-              <Label htmlFor="eventDate">Tarih & Saat</Label>
+              <Label htmlFor="eventDate">Date & Time</Label>
               <Input
                 id="eventDate"
                 name="eventDate"
@@ -53,14 +50,18 @@ export default function CreateEventPage() {
               />
             </div>
             <div>
-              <Label htmlFor="participantLimit">Katılımcı Limiti</Label>
+              <Label htmlFor="participantLimit">Participant Limit</Label>
               <Input
                 id="participantLimit"
                 name="participantLimit"
                 type="number"
+                placeholder="e.g. 50"
               />
             </div>
-            <Button type="submit">Oluştur</Button>
+
+            <Button type="submit" className="mt-4 w-full">
+              Create Event
+            </Button>
           </form>
         </CardContent>
       </Card>
