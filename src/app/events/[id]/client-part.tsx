@@ -6,25 +6,27 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-type RsvpItem = {
+type RsvpItemWithName = {
   id: number;
   clerkUserId: string;
   eventId: number;
-  status: string; // GOING, MAYBE, NOT
+  status: string;
   createdAt: Date;
+  fullName: string; // EKLENDİ
 };
 
 type EventData = {
   id: number;
   name: string;
-  creatorUserId: string;
+  description: string | null;
   eventDate: Date;
   participantLimit: number | null;
+  creatorUserId: string;
 };
 
 interface EventDetailClientProps {
   eventData: EventData;
-  rsvpList: RsvpItem[];
+  rsvpList: RsvpItemWithName[];
 }
 
 export default function EventDetailClient({
@@ -34,14 +36,13 @@ export default function EventDetailClient({
   const { userId } = useAuth();
   const router = useRouter();
 
-  // Creator mu?
+  // Creator mı?
   const isCreator = userId === eventData.creatorUserId;
 
-  // Kullanıcının mevcut RSVP'si
+  // Kullanıcının mevcut RSVP'si (varsa)
   const userRsvp = rsvpList.find((r) => r.clerkUserId === userId);
   const [status, setStatus] = useState(userRsvp?.status ?? "GOING");
 
-  // RSVP isteği
   async function handleRsvp() {
     if (!userId) {
       router.push("/sign-in");
@@ -55,10 +56,10 @@ export default function EventDetailClient({
     await rsvpEventAction(fd);
     router.refresh();
   }
-  console.log(rsvpList);
+
   return (
     <div className="mt-4 space-y-4">
-      {/* Creator'a özel: RSVP yapanların listesi */}
+      {/* Creator ise katılanlar listesi */}
       {isCreator && (
         <div className="p-3 bg-gray-50 rounded">
           <h2 className="font-semibold mb-2">Katılanlar Listesi</h2>
@@ -68,7 +69,7 @@ export default function EventDetailClient({
             <ul className="list-disc list-inside text-sm">
               {rsvpList.map((r) => (
                 <li key={r.id}>
-                  {r.clerkUserId} – {r.status.toUpperCase()}
+                  <strong>{r.fullName}</strong> – {r.status.toUpperCase()}
                 </li>
               ))}
             </ul>
@@ -79,21 +80,21 @@ export default function EventDetailClient({
       {/* Kullanıcı RSVP durumu */}
       {!isCreator && userRsvp && (
         <p className="text-green-600">
-          Şu anda RSVP durumun: <strong>{userRsvp.status}</strong>
+          RSVP durumun: <strong>{userRsvp.status}</strong>
         </p>
       )}
       {!isCreator && !userRsvp && (
         <p className="text-red-600">Henüz RSVP yapmadın.</p>
       )}
 
-      {/* RSVP Seçimi */}
+      {/* RSVP Formu */}
       {!isCreator && (
         <form
           onSubmit={(e) => {
             e.preventDefault();
             handleRsvp();
           }}
-          className="space-x-2"
+          className="flex items-center gap-2"
         >
           <select
             value={status}
