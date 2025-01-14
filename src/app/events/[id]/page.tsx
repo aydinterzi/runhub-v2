@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import db from "@/db";
-import { events as eventsTable } from "@/db/schema";
+import { events as eventsTable, rsvps } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import RSVPButton from "./rsvp-button";
+import EventDetailClient from "./client-part";
 
 export default async function EventDetailPage({
   params,
@@ -11,6 +11,8 @@ export default async function EventDetailPage({
   params: { id: string };
 }) {
   const eventId = parseInt(params.id, 10);
+
+  // Etkinlik kaydı
   const [eventData] = await db
     .select()
     .from(eventsTable)
@@ -19,6 +21,12 @@ export default async function EventDetailPage({
   if (!eventData) {
     return notFound();
   }
+
+  // RSVP listesi (kim, hangi status)
+  const rsvpList = await db
+    .select()
+    .from(rsvps)
+    .where(eq(rsvps.eventId, eventId));
 
   const dateStr = new Date(eventData.eventDate).toLocaleString();
 
@@ -33,9 +41,9 @@ export default async function EventDetailPage({
           <p className="text-sm text-gray-600">
             <span className="font-semibold">Etkinlik Tarihi:</span> {dateStr}
           </p>
-          <div className="mt-4">
-            <RSVPButton eventId={eventData.id} />
-          </div>
+
+          {/* Client tarafına rsvpList ve eventData (creatorUserId) geçiyoruz */}
+          <EventDetailClient eventData={eventData} rsvpList={rsvpList} />
         </CardContent>
       </Card>
     </div>

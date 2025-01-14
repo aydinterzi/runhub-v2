@@ -7,19 +7,20 @@ import { and, eq } from "drizzle-orm";
 
 // Topluluk oluşturma
 export async function createCommunityAction(formData: FormData) {
-  // formData'dan alanları çekiyoruz
   const name = formData.get("name") as string;
   const description = formData.get("description") as string;
   const location = formData.get("location") as string;
+  // EKLENDİ: Topluluğu kim oluşturdu?
+  const creatorUserId = formData.get("creatorUserId") as string;
 
   // Drizzle ile veritabanına kayıt
   await db.insert(communities).values({
     name,
     description,
     location,
+    creatorUserId, // EKLENDİ
   });
 
-  // Listeleme sayfasının ("/community") revalidate edilmesi
   revalidatePath("/community");
 }
 

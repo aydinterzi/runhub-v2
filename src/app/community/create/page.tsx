@@ -8,9 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+
+import { useAuth } from "@clerk/nextjs";
+
 export default function CreateCommunityPage() {
   const router = useRouter();
-
+  const { userId } = useAuth();
   // Formun "action" prop'u Server Action fonksiyonunu işaret edecek
   // onSubmit yerine, form otomatik olarak bu action'a POST gönderecek
   return (
@@ -22,8 +25,12 @@ export default function CreateCommunityPage() {
         <CardContent>
           <form
             action={async (formData) => {
-              // Bu callback "use server" fonksiyonuna gitmeden önce
-              // client tarafında ek bir şey yapmak isterseniz.
+              if (!userId) {
+                router.push("/sign-in");
+                return;
+              }
+              formData.append("creatorUserId", userId);
+
               await createCommunityAction(formData);
               router.push("/community");
             }}

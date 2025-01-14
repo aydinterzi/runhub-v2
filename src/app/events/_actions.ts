@@ -10,8 +10,9 @@ export async function createEventAction(formData: FormData) {
   const description = formData.get("description") as string;
   const eventDateStr = formData.get("eventDate") as string;
   const participantLimitStr = formData.get("participantLimit") as string;
+  // EKLENDİ
+  const creatorUserId = formData.get("creatorUserId") as string;
 
-  // FormData string döndüreceği için dönüştürelim
   const eventDate = new Date(eventDateStr);
   const participantLimit = participantLimitStr
     ? parseInt(participantLimitStr, 10)
@@ -22,6 +23,7 @@ export async function createEventAction(formData: FormData) {
     description,
     eventDate,
     participantLimit,
+    creatorUserId, // EKLENDİ
   });
 
   revalidatePath("/events");

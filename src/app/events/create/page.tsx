@@ -8,9 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 import { createEventAction } from "../_actions";
+import { useAuth } from "@clerk/nextjs";
 
 export default function CreateEventPage() {
   const router = useRouter();
+  const { userId } = useAuth();
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -23,6 +25,14 @@ export default function CreateEventPage() {
         <CardContent>
           <form
             action={async (formData) => {
+              if (!userId) {
+                router.push("/sign-in");
+                return;
+              }
+
+              // creatorUserId olarak ekledik
+              formData.append("creatorUserId", userId);
+
               await createEventAction(formData);
               router.push("/events");
             }}

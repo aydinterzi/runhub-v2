@@ -4,7 +4,6 @@ import {
   varchar,
   text,
   integer,
-  boolean,
   timestamp,
   primaryKey,
 } from "drizzle-orm/pg-core";
@@ -15,6 +14,7 @@ export const communities = pgTable("communities", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
+  creatorUserId: varchar("creator_user_id", { length: 255 }).notNull(),
   location: varchar("location", { length: 255 }),
   createdAt: timestamp("created_at")
     .default(sql`NOW()`)
@@ -49,6 +49,7 @@ export const events = pgTable("events", {
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
   eventDate: timestamp("event_date").notNull(),
+  creatorUserId: varchar("creator_user_id", { length: 255 }).notNull(),
   communityId: integer("community_id"), // opsiyonel olarak topluluğa bağlı
   participantLimit: integer("participant_limit"),
   createdAt: timestamp("created_at")
@@ -62,17 +63,6 @@ export const rsvps = pgTable("rsvps", {
   clerkUserId: varchar("clerk_user_id", { length: 255 }).notNull(),
   eventId: integer("event_id").notNull(),
   status: varchar("status", { length: 10 }).default("MAYBE"), // "GOING", "MAYBE", "NOT"
-  createdAt: timestamp("created_at")
-    .default(sql`NOW()`)
-    .notNull(),
-});
-
-// 5) NOTIFICATIONS
-export const notifications = pgTable("notifications", {
-  id: serial("id").primaryKey(),
-  clerkUserId: varchar("clerk_user_id", { length: 255 }).notNull(),
-  message: text("message").notNull(),
-  isRead: boolean("is_read").default(false).notNull(),
   createdAt: timestamp("created_at")
     .default(sql`NOW()`)
     .notNull(),

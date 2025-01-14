@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import db from "@/db";
-import { communities } from "@/db/schema";
+import { communities, communityMembers } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import JoinCommunityButton from "./join-button";
+import CommunityDetailClient from "./client-part";
 
 export default async function CommunityDetailPage({
   params,
@@ -20,6 +20,12 @@ export default async function CommunityDetailPage({
     return notFound();
   }
 
+  // Kimler katılmış?
+  const members = await db
+    .select()
+    .from(communityMembers)
+    .where(eq(communityMembers.communityId, communityId));
+
   return (
     <div className="container mx-auto py-8">
       <Card className="max-w-lg mx-auto">
@@ -32,10 +38,13 @@ export default async function CommunityDetailPage({
             Lokasyon: {community.location || "Belirtilmemiş"}
           </p>
 
-          {/* "Join" butonu veya formu */}
-          <div className="mt-4">
-            <JoinCommunityButton communityId={community.id} />
-          </div>
+          {/* Client tarafında, creatorUserId ve members gibi bilgileri
+              kullanarak "katıldı mı", "creator mı" gibi durumları yöneteceğiz. */}
+          <CommunityDetailClient
+            communityId={community.id}
+            creatorUserId={community.creatorUserId}
+            members={members} // clerkUserId, communityId, joinedAt
+          />
         </CardContent>
       </Card>
     </div>
