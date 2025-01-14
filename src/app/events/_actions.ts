@@ -2,8 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import db from "@/db/index";
-import { events } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { events, rsvps } from "@/db/schema";
+import { and, eq } from "drizzle-orm";
 
 export async function createEventAction(formData: FormData) {
   const name = formData.get("name") as string;
@@ -31,4 +31,32 @@ export async function createEventAction(formData: FormData) {
 export async function deleteEventAction(id: number) {
   await db.delete(events).where(eq(events.id, id));
   revalidatePath("/events");
+}
+
+export async function rsvpEventAction(formData: FormData) {
+  const clerkUserId = formData.get("clerkUserId") as string;
+  const eventIdStr = formData.get("eventId") as string;
+  const status = formData.get("status") as string; // "GOING", "MAYBE", "NOT" vb.
+
+  const eventId = parseInt(eventIdStr, 10);
+
+  // Daha önce RSVP yapıldı mı?
+  const existing = await db
+    .select()
+    .from(rsvps)
+    .where(and(eq(rsvps.clerkUserId, clerkUserId), eq(rsvps.eventId, eventId)));
+
+  if (existing.length > 0) {
+    // Daha önce varsa güncelle
+    await db.update(rsvps).set({ status }).where(eq(rsvps.id, existing[0].id));
+  } else {
+    // Yoksa yeni kayıt
+    await db.insert(rsvps).values({
+      clerkUserId,
+      eventId,
+      status,
+    });
+  }
+
+  revalidatePath(`/events/${eventIdStr}`);
 }

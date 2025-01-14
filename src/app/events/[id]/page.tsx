@@ -3,6 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import db from "@/db";
 import { events as eventsTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import RSVPButton from "./rsvp-button";
 
 export default async function EventDetailPage({
   params,
@@ -30,12 +31,11 @@ export default async function EventDetailPage({
         <CardContent className="space-y-2">
           <p className="text-gray-700">{eventData.description}</p>
           <p className="text-sm text-gray-600">
-            <span className="font-semibold">Event Date:</span> {dateStr}
+            <span className="font-semibold">Etkinlik Tarihi:</span> {dateStr}
           </p>
-          <p className="text-sm text-gray-600">
-            <span className="font-semibold">Participant Limit:</span>{" "}
-            {eventData.participantLimit ?? "No limit"}
-          </p>
+          <div className="mt-4">
+            <RSVPButton eventId={eventData.id} />
+          </div>
         </CardContent>
       </Card>
     </div>

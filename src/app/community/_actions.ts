@@ -2,8 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import db from "@/db/index";
-import { communities } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { communities, communityMembers } from "@/db/schema";
+import { and, eq } from "drizzle-orm";
 
 // Topluluk oluşturma
 export async function createCommunityAction(formData: FormData) {
@@ -27,4 +27,34 @@ export async function createCommunityAction(formData: FormData) {
 export async function deleteCommunityAction(id: number) {
   await db.delete(communities).where(eq(communities.id, id));
   revalidatePath("/community");
+}
+
+export async function joinCommunityAction(formData: FormData) {
+  const clerkUserId = formData.get("clerkUserId") as string;
+  const communityIdStr = formData.get("communityId") as string;
+
+  // parseInt
+  const communityId = parseInt(communityIdStr, 10);
+
+  // Daha önce katılmış mı kontrol edebilirsiniz
+  const existing = await db
+    .select()
+    .from(communityMembers)
+    .where(
+      and(
+        eq(communityMembers.clerkUserId, clerkUserId),
+        eq(communityMembers.communityId, communityId)
+      )
+    );
+
+  if (existing.length === 0) {
+    // Kayıt yoksa yeni satır ekle
+    await db.insert(communityMembers).values({
+      clerkUserId,
+      communityId,
+    });
+  }
+
+  // Liste sayfasını veya detay sayfasını revalidate edin
+  revalidatePath(`/community/${communityIdStr}`);
 }
